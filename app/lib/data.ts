@@ -1,4 +1,4 @@
-export async function fetchFakeFood() {
-  const res = await fetch('https://api.frontendeval.com/fake/food/ba');
+export async function fetchFakeFood(q: string) {
+  const res = await fetch(`https://api.frontendeval.com/fake/food/${q}`);
   return res.json();
 }

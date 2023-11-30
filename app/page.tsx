@@ -1,19 +1,16 @@
-import { ReactElement, JSXElementConstructor, ReactNode, ReactPortal, PromiseLikeOfReactNode } from 'react';
-import { fetchFakeFood } from './lib/data'
-import styles from './page.module.css'
+'use client';
 
-export default async function Home() {
-  const fakeFood = fetchFakeFood();
-  const [foodList] = await Promise.all([fakeFood])
-  console.log('foodList: ', foodList)
+import { useState } from 'react';
+import styles from './page.module.css'
+import { fetchFakeFood } from './lib/data';
+import Search from './ui/search';
+
+export default function Home() {
+  
   return (
     <main className={styles.main}>
       <h1>Shopping List...</h1>
-      <ul>
-        {foodList.map((item: string, index: any) => 
-          <li key={index + item}>{item}</li>  
-        )}
-      </ul>
+      <Search />
     </main>
-  )
+  );
 }
