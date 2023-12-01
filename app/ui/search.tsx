@@ -3,16 +3,23 @@
 import { useState, useEffect } from 'react';
 import styles from './search.module.css'
 import { fetchFakeFood } from '../lib/data';
+type LItem = {
+  id: string,
+  name: string,
+  active: boolean,
+  checked: boolean,
+}
 
 export default function Search() {
   const [query, setQuery] = useState('');
   const [fakeFood, setFakeFood] = useState([]);
-  const [currentList, setCurrentList] = useState<string[]>([]);
+  const [currentList, setCurrentList] = useState<LItem[]>([]);
+  console.log(currentList)
   
   useEffect(() => {
     const debounceId = setTimeout(() => {
       submitQuery();
-    }, 500);
+    }, 200);
     return () => clearTimeout(debounceId);
    }, [query])
 
@@ -20,13 +27,47 @@ export default function Search() {
     const {target} = e;
     setQuery(target.value)
   }
-  function addToTheList(e: React.MouseEvent<HTMLLIElement>) {
+  
+  function onFormSubmit(e: React.FormEvent<HTMLFormElement>) {
+    if (query.length < 2) return;
+    e.preventDefault();
+    setCurrentList([
+      {
+        id: crypto.randomUUID(),
+        name: query,
+        active: true,
+        checked: false
+      },
+      ...currentList
+    ]);
+    setQuery('');
+  }
+  
+  function addToTheList(e: React.MouseEvent) {
     const {target} = e;
     const item = target as HTMLLIElement;
     setCurrentList([
-      item.innerText,
+      {
+        id: crypto.randomUUID(),
+        name: item.innerText,
+        active: true,
+        checked: false
+      },
       ...currentList
     ]);
+    setQuery('');
+  }
+
+  function updateListItem(id: string, action: string) {
+    const newCurrentList = [...currentList];
+    const nextList = newCurrentList.map(item => {
+      if (item.id === id) {
+        if (action === 'checked') return {...item, checked: !item.checked}
+        return {...item, active: !item.active}
+      }
+      return item;
+    })
+    setCurrentList(nextList)
   }
 
   async function submitQuery() {
@@ -39,9 +80,8 @@ export default function Search() {
   
   return (
     <main className={styles.main}>
-      <div>
-        <form>
-          <label>search: </label><br/>
+      <div className={styles.search_container}>
+        <form onSubmit={(e) => onFormSubmit(e)}>
           <input
             type='text'
             name='search'
@@ -57,16 +97,29 @@ export default function Search() {
           )}
         </ul>
       </div>
-      <div>
-        <ul className={styles.list}>
+      <div className={styles.list_container}>
+        <ul>
           {currentList.length > 0 && currentList.map((item, index) => 
-            <li key={item + index} className={styles.list_item}>
-              <span className={styles.list_item__check}>&#9989;</span>
-              <span className={styles.list_item__name}>{item}</span>
-              <span className={styles.list_item__cross}>&#10007;</span>
+            <li 
+              key={item.id} 
+              className={
+                `${item.checked ? styles.list_item__checked : styles.list_item} 
+                ${!item.active ? styles.list_item__inactive : '' }`
+              }
+            >
+              <span className={styles.list_item_name}>{item.name}</span>
+              <div className={styles.toggle_wrapper}>
+                <span 
+                  onClick={() => updateListItem(item.id, 'checked')} 
+                  className={styles.list_item_check}>&#9989;
+                </span>
+                <span 
+                  onClick={() => updateListItem(item.id, 'crossed')}
+                  className={styles.list_item_cross}>&#10007;
+                </span>
+              </div>
             </li>
-          )
-          }
+          )}
         </ul>
       </div>
     </main>
