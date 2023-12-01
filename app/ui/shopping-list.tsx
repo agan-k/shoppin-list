@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import styles from './search.module.css'
+import styles from './shoppig-list.module.css'
 import { fetchFakeFood } from '../lib/data';
 type LItem = {
   id: string,
@@ -10,11 +10,10 @@ type LItem = {
   checked: boolean,
 }
 
-export default function Search() {
+export default function ShoppingList() {
   const [query, setQuery] = useState('');
-  const [fakeFood, setFakeFood] = useState([]);
+  const [fetchedFood, setFetchedFood] = useState([]);
   const [currentList, setCurrentList] = useState<LItem[]>([]);
-  console.log(currentList)
   
   useEffect(() => {
     const debounceId = setTimeout(() => {
@@ -23,18 +22,34 @@ export default function Search() {
     return () => clearTimeout(debounceId);
    }, [query])
 
+  async function submitQuery() {
+    if (query.length < 2) {
+      setFetchedFood([]);
+      return;
+    }
+    setFetchedFood(await fetchFakeFood(query));
+  }
+
   function onChange(e: React.ChangeEvent<HTMLInputElement>) {
     const {target} = e;
     setQuery(target.value)
   }
   
-  function onFormSubmit(e: React.FormEvent<HTMLFormElement>) {
+  function handleAddWithEnter(e: React.FormEvent<HTMLFormElement>) {
     if (query.length < 2) return;
     e.preventDefault();
+    let name: string;
+    const queryHasSpace: boolean = Boolean(query[query.length -1] === ' ');
+    const queryHasMatch: boolean = Boolean(fetchedFood.length != 0);
+    if (queryHasSpace || !queryHasMatch) {
+      name = query;
+    } else {
+      name = fetchedFood[0];
+    }
     setCurrentList([
       {
         id: crypto.randomUUID(),
-        name: query,
+        name: name,
         active: true,
         checked: false
       },
@@ -43,7 +58,7 @@ export default function Search() {
     setQuery('');
   }
   
-  function addToTheList(e: React.MouseEvent) {
+  function handleAddWithClick(e: React.MouseEvent) {
     const {target} = e;
     const item = target as HTMLLIElement;
     setCurrentList([
@@ -69,19 +84,12 @@ export default function Search() {
     })
     setCurrentList(nextList)
   }
-
-  async function submitQuery() {
-    if (query.length < 2) {
-      setFakeFood([]);
-      return;
-    }
-    setFakeFood(await fetchFakeFood(query));
-  }
   
   return (
     <main className={styles.main}>
       <div className={styles.search_container}>
-        <form onSubmit={(e) => onFormSubmit(e)}>
+        <form onSubmit={(e) => handleAddWithEnter(e)}>
+          <label>add items:{' '}</label>
           <input
             type='text'
             name='search'
@@ -92,8 +100,8 @@ export default function Search() {
           />
         </form>
         <ul>
-          {query.length > 1 && fakeFood.map((item, index) => 
-            <li key={item + index} onClick={e => addToTheList(e)}>{item}</li>
+          {query.length > 1 && fetchedFood.map((item, index) => 
+            <li key={item + index} onClick={e => handleAddWithClick(e)}>{item}</li>
           )}
         </ul>
       </div>

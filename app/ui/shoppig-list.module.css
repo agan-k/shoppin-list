@@ -1,13 +1,10 @@
 .main {
-  width: 300px;
+  width: 100%;
   min-height: 100vh;
   position: relative;
-  /* display: flex; */
-  /* justify-content: space-around; */
-  margin: 0 auto;
   padding-top: 10px;
+  margin: 0 auto;
 }
-
 .main li{
   list-style: none;
 }
@@ -18,20 +15,19 @@
 .search_container {
   position: absolute;
 }
-.search_container input {
-  /* width: 300px; */
+.search_container label {
+  font-size: .9em;
+  color: gray;
 }
 .search_container ul {
   background: none;
   background: rgb(32, 32, 32);
   color: rgb(132, 131, 131);
-  /* padding-bottom: 2em; */
   opacity: .9;
 }
 .search_container li {
   background: none;
   padding: .1em;
-  /* opacity: 0; */
 }
 
 .list_item, .list_item__checked {
