@@ -4,6 +4,10 @@
   position: relative;
   padding-top: 10px;
   margin: 0 auto;
+  font-size: 16px;
+}
+.main input[type="text"] {
+  font-size: inherit;
 }
 .main li{
   list-style: none;
@@ -16,7 +20,6 @@
   position: absolute;
 }
 .search_container label {
-  font-size: .9em;
   color: gray;
 }
 .search_container ul {
