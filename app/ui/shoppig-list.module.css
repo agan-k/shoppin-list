@@ -8,6 +8,7 @@
 }
 .main input[type="text"] {
   font-size: inherit;
+  text-transform: lowercase;
 }
 .main li{
   list-style: none;
