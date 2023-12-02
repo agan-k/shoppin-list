@@ -27,7 +27,8 @@
 }
 .search_container li {
   background: none;
-  padding: .1em;
+  padding: .4em;
+  cursor: pointer;
 }
 
 .list_item, .list_item__checked {
