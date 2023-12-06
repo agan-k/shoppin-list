@@ -12,8 +12,11 @@ type LItem = {
 
 export default function ShoppingList() {
   const [query, setQuery] = useState('');
-  const [fetchedFood, setFetchedFood] = useState([]);
-  const [currentList, setCurrentList] = useState<LItem[]>([]);
+  const [fetchedSuggestion, setFetchedSuggestion] = useState([]);
+  const [currentList, setCurrentList] = useState(
+    JSON.parse(localStorage.getItem('list')) || []
+  );
+  console.log({...localStorage.list})
   
   useEffect(() => {
     const debounceId = setTimeout(() => {
@@ -24,10 +27,10 @@ export default function ShoppingList() {
 
   async function submitQuery() {
     if (query.length < 2) {
-      setFetchedFood([]);
+      setFetchedSuggestion([]);
       return;
     }
-    setFetchedFood(await fetchFakeFood(query));
+    setFetchedSuggestion(await fetchFakeFood(query));
   }
 
   function onChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -40,21 +43,23 @@ export default function ShoppingList() {
     e.preventDefault();
     let name: string;
     const queryHasSpace: boolean = Boolean(query[query.length -1] === ' ');
-    const queryHasMatch: boolean = Boolean(fetchedFood.length != 0);
+    const queryHasMatch: boolean = Boolean(fetchedSuggestion.length != 0);
     if (queryHasSpace || !queryHasMatch) {
       name = query;
     } else {
-      name = fetchedFood[0];
+      name = fetchedSuggestion[0];
     }
-    setCurrentList([
-      {
-        id: crypto.randomUUID(),
-        name: name,
-        active: true,
-        checked: false
-      },
-      ...currentList
-    ]);
+    setCurrentList(
+      localStorage.setItem('list', JSON.stringify(
+        [{
+          id: crypto.randomUUID(),
+          name: name,
+          active: true,
+          checked: false
+        },
+        ...currentList
+      ]))
+    );
     setQuery('');
   }
   
@@ -100,14 +105,14 @@ export default function ShoppingList() {
           />
         </form>
         <ul>
-          {query.length > 1 && fetchedFood.map((item, index) => 
+          {query.length > 1 && fetchedSuggestion.map((item, index) => 
             <li key={item + index} onClick={e => handleAddWithClick(e)}>{item}</li>
           )}
         </ul>
       </div>
       <div className={styles.list_container}>
         <ul>
-          {currentList.length > 0 && currentList.map((item, index) => 
+          {currentList.length > 0 && currentList.map(item => 
             <li 
               key={item.id} 
               className={
