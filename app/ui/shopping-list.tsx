@@ -16,7 +16,8 @@ export default function ShoppingList() {
   const [currentList, setCurrentList] = useState(
     JSON.parse(localStorage.getItem('list')) || []
   );
-  console.log({...localStorage.list})
+  console.log(JSON.parse(localStorage.getItem('list')))
+  console.log(typeof currentList)
   
   useEffect(() => {
     const debounceId = setTimeout(() => {
@@ -112,7 +113,7 @@ export default function ShoppingList() {
       </div>
       <div className={styles.list_container}>
         <ul>
-          {currentList.length > 0 && currentList.map(item => 
+          {currentList?.length > 0 && currentList.map(item => 
             <li 
               key={item.id} 
               className={
