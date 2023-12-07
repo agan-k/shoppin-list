@@ -1,30 +1,26 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import useLocalStorage from '../lib/useLocalStorage';
 import styles from './shoppig-list.module.css'
 import { fetchFakeFood } from '../lib/data';
 type LItem = {
   id: string,
   name: string,
-  active: boolean,
   checked: boolean,
 }
 
 export default function ShoppingList() {
   const [query, setQuery] = useState('');
   const [fetchedSuggestion, setFetchedSuggestion] = useState([]);
-  const [currentList, setCurrentList] = useState(
-    JSON.parse(localStorage.getItem('list')) || []
-  );
-  console.log(JSON.parse(localStorage.getItem('list')))
-  console.log(typeof currentList)
+  const [currentList, setCurrentList] = useLocalStorage('list', []);
   
   useEffect(() => {
     const debounceId = setTimeout(() => {
       submitQuery();
     }, 200);
     return () => clearTimeout(debounceId);
-   }, [query])
+   }, [query]);
 
   async function submitQuery() {
     if (query.length < 2) {
@@ -51,15 +47,14 @@ export default function ShoppingList() {
       name = fetchedSuggestion[0];
     }
     setCurrentList(
-      localStorage.setItem('list', JSON.stringify(
-        [{
+      [
+        {
           id: crypto.randomUUID(),
           name: name,
-          active: true,
           checked: false
         },
         ...currentList
-      ]))
+      ]
     );
     setQuery('');
   }
@@ -71,26 +66,33 @@ export default function ShoppingList() {
       {
         id: crypto.randomUUID(),
         name: item.innerText,
-        active: true,
         checked: false
       },
-      ...currentList
+        ...currentList
     ]);
     setQuery('');
   }
 
   function updateListItem(id: string, action: string) {
     const newCurrentList = [...currentList];
-    const nextList = newCurrentList.map(item => {
-      if (item.id === id) {
-        if (action === 'checked') return {...item, checked: !item.checked}
-        return {...item, active: !item.active}
-      }
-      return item;
-    })
+    let nextList: object [] = [];
+    if (action === 'crossed') {
+      nextList = newCurrentList.filter(item => item.id != id);
+    }
+    if (action === 'checked') {
+      nextList = newCurrentList.map(item => {
+        if (item.id === id) {
+          return {
+            ...item, 
+            checked: !item.checked
+          }
+        }
+        return item;
+      })
+    }
     setCurrentList(nextList)
   }
-  
+
   return (
     <main className={styles.main}>
       <div className={styles.search_container}>
@@ -115,13 +117,12 @@ export default function ShoppingList() {
         <ul>
           {currentList?.length > 0 && currentList.map(item => 
             <li 
-              key={item.id} 
+              key={item?.id} 
               className={
-                `${item.checked ? styles.list_item__checked : styles.list_item} 
-                ${!item.active ? styles.list_item__inactive : '' }`
+                `${item?.checked ? styles.list_item__checked : styles.list_item}`
               }
             >
-              <span className={styles.list_item_name}>{item.name}</span>
+              <span className={styles.list_item_name}>{item?.name}</span>
               <div className={styles.toggle_wrapper}>
                 <span 
                   onClick={() => updateListItem(item.id, 'checked')} 

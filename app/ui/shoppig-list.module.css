@@ -42,9 +42,7 @@
   align-items: center;
   padding: .5em;
 }
-.list_item__inactive {
-  display: none
-}
+
 .list_item__checked {
   color: gray;
   background: rgb(25, 25, 25);
@@ -54,6 +52,7 @@
 }
 .list_item_check, .list_item_cross {
   padding: 0 .5em;
+  cursor: pointer;
 }
 .list_item_cross {
   color: red;
