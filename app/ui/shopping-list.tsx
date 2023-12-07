@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, JSXElementConstructor, Key, PromiseLikeOfReactNode, ReactElement, ReactNode, ReactPortal } from 'react';
 import useLocalStorage from '../lib/useLocalStorage';
 import styles from './shoppig-list.module.css'
 import { fetchFakeFood } from '../lib/data';
@@ -115,7 +115,7 @@ export default function ShoppingList() {
       </div>
       <div className={styles.list_container}>
         <ul>
-          {currentList?.length > 0 && currentList.map(item => 
+          {currentList?.length > 0 && currentList.map((item: { id: string; checked: boolean; name: string; }) => 
             <li 
               key={item?.id} 
               className={
