@@ -76,7 +76,7 @@ export default function ShoppingList() {
 
   function updateListItem(id: string, action: string) {
     const newCurrentList = [...currentList];
-    let nextList = [];
+    let nextList;
     if (action === 'crossed') {
       nextList = newCurrentList.filter(item => item.id != id);
     }
