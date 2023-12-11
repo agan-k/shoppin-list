@@ -1,10 +1,13 @@
-'use client';
 
+'use client';
 import { useState, useEffect } from 'react';
-import useLocalStorage from '../lib/useLocalStorage';
+// import useLocalStorage from '../lib/useLocalStorage';
 import styles from './shoppig-list.module.css'
 import { fetchFakeFood } from '../lib/data';
-type LItem = {
+
+const LOCAL_STORAGE_KEY = '__list';
+
+export type LItem = {
   id: string,
   name: string,
   checked: boolean,
@@ -14,7 +17,14 @@ export default function ShoppingList() {
   const [query, setQuery] = useState('');
   const [fetchedSuggestion, setFetchedSuggestion] = useState([]);
   const [currentList, setCurrentList] = useState<LItem[]>([]);
-  // const [currentList, setCurrentList] = useLocalStorage('list', []);
+  console.log(currentList)
+
+  useEffect(() => {
+    const list = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) || '')
+    if (!list) return;
+    setCurrentList(list);
+  }, []);
+
 
   useEffect(() => {
     const debounceId = setTimeout(() => {
@@ -47,16 +57,16 @@ export default function ShoppingList() {
     } else {
       name = fetchedSuggestion[0];
     }
-    setCurrentList(
-      [
-        {
-          id: crypto.randomUUID(),
-          name: name,
-          checked: false
-        },
-        ...currentList
-      ]
-    );
+    const nextList = [
+      {
+        id: crypto.randomUUID(),
+        name: name,
+        checked: false
+      },
+      ...currentList
+    ]
+    setCurrentList(nextList);
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(nextList));
     setQuery('');
   }
   
@@ -98,11 +108,10 @@ export default function ShoppingList() {
     <main className={styles.main}>
       <div className={styles.search_container}>
         <form onSubmit={(e) => handleAddWithEnter(e)}>
-          <label>add items:{' '}</label>
           <input
             type='text'
             name='search'
-            placeholder='serach...'
+            placeholder='add items...'
             autoComplete='off'
             value={query}
             onChange={e => onChange(e)}
@@ -116,7 +125,7 @@ export default function ShoppingList() {
       </div>
       <div className={styles.list_container}>
         <ul>
-          {currentList?.length > 0 && currentList.map((item: { id: string; checked: boolean; name: string; }) => 
+          {currentList?.length > 0 ? currentList.map((item: { id: string; checked: boolean; name: string; }) => 
             <li 
               key={item?.id} 
               className={
@@ -135,7 +144,7 @@ export default function ShoppingList() {
                 </span>
               </div>
             </li>
-          )}
+          ) : <li className={styles.list_item__loading}>Fetching list ...</li>}
         </ul>
       </div>
     </main>
