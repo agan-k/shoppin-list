@@ -1,6 +1,6 @@
 'use client';
+
 import { useState, useEffect } from 'react';
-// import useLocalStorage from '../lib/useLocalStorage';
 import styles from './shoppig-list.module.css'
 import { fetchFakeFood } from '../lib/data';
 
@@ -16,7 +16,6 @@ export default function ShoppingList() {
   const [query, setQuery] = useState('');
   const [fetchedSuggestion, setFetchedSuggestion] = useState([]);
   const [currentList, setCurrentList] = useState<LItem[]>([]);
-  console.log(currentList)
 
   useEffect(() => {
     const list = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)!)
@@ -72,20 +71,23 @@ export default function ShoppingList() {
   function handleAddWithClick(e: React.MouseEvent) {
     const {target} = e;
     const item = target as HTMLLIElement;
-    setCurrentList([
+    const nextList = [
       {
         id: crypto.randomUUID(),
         name: item.innerText,
         checked: false
       },
-        ...currentList
-    ]);
+      ...currentList
+    ]
+    setCurrentList(nextList);
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(nextList));
     setQuery('');
   }
 
   function updateListItem(id: string, action: string) {
     const newCurrentList = [...currentList];
     let nextList;
+    const __item = currentList.find(item => item.id === id)
     if (action === 'crossed') {
       nextList = newCurrentList.filter(item => item.id != id);
     }
@@ -101,6 +103,7 @@ export default function ShoppingList() {
       })
     }
     setCurrentList(nextList as LItem[])
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(nextList));
   }
 
   return (
@@ -124,7 +127,7 @@ export default function ShoppingList() {
       </div>
       <div className={styles.list_container}>
         <ul>
-          {currentList?.length > 0 ? currentList.map((item: { id: string; checked: boolean; name: string; }) => 
+          {currentList?.length > 0 && currentList.map((item: { id: string; checked: boolean; name: string; }) => 
             <li 
               key={item?.id} 
               className={
@@ -143,7 +146,7 @@ export default function ShoppingList() {
                 </span>
               </div>
             </li>
-          ) : <li className={styles.list_item__loading}>Fetching list ...</li>}
+          )}
         </ul>
       </div>
     </main>
