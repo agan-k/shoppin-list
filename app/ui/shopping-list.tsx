@@ -1,4 +1,3 @@
-
 'use client';
 import { useState, useEffect } from 'react';
 // import useLocalStorage from '../lib/useLocalStorage';
@@ -20,7 +19,7 @@ export default function ShoppingList() {
   console.log(currentList)
 
   useEffect(() => {
-    const list = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) || '')
+    const list = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY))
     if (!list) return;
     setCurrentList(list);
   }, []);
