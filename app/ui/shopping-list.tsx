@@ -3,31 +3,40 @@
 import { useState, useEffect } from 'react';
 import styles from './shoppig-list.module.css'
 import { fetchFakeFood } from '../lib/data';
-type LItem = {
+
+const LOCAL_STORAGE_KEY = '__list';
+
+export type LItem = {
   id: string,
   name: string,
-  active: boolean,
   checked: boolean,
 }
 
 export default function ShoppingList() {
   const [query, setQuery] = useState('');
-  const [fetchedFood, setFetchedFood] = useState([]);
+  const [fetchedSuggestion, setFetchedSuggestion] = useState([]);
   const [currentList, setCurrentList] = useState<LItem[]>([]);
-  
+
+  useEffect(() => {
+    const list = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)!)
+    if (!list) return;
+    setCurrentList(list);
+  }, []);
+
+
   useEffect(() => {
     const debounceId = setTimeout(() => {
       submitQuery();
     }, 200);
     return () => clearTimeout(debounceId);
-   }, [query])
+   }, [query]);
 
   async function submitQuery() {
     if (query.length < 2) {
-      setFetchedFood([]);
+      setFetchedSuggestion([]);
       return;
     }
-    setFetchedFood(await fetchFakeFood(query));
+    setFetchedSuggestion(await fetchFakeFood(query));
   }
 
   function onChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -40,82 +49,92 @@ export default function ShoppingList() {
     e.preventDefault();
     let name: string;
     const queryHasSpace: boolean = Boolean(query[query.length -1] === ' ');
-    const queryHasMatch: boolean = Boolean(fetchedFood.length != 0);
+    const queryHasMatch: boolean = Boolean(fetchedSuggestion.length != 0);
     if (queryHasSpace || !queryHasMatch) {
       name = query;
     } else {
-      name = fetchedFood[0];
+      name = fetchedSuggestion[0];
     }
-    setCurrentList([
+    const nextList = [
       {
         id: crypto.randomUUID(),
         name: name,
-        active: true,
         checked: false
       },
       ...currentList
-    ]);
+    ]
+    setCurrentList(nextList);
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(nextList));
     setQuery('');
   }
   
   function handleAddWithClick(e: React.MouseEvent) {
     const {target} = e;
     const item = target as HTMLLIElement;
-    setCurrentList([
+    const nextList = [
       {
         id: crypto.randomUUID(),
         name: item.innerText,
-        active: true,
         checked: false
       },
       ...currentList
-    ]);
+    ]
+    setCurrentList(nextList);
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(nextList));
     setQuery('');
   }
 
   function updateListItem(id: string, action: string) {
     const newCurrentList = [...currentList];
-    const nextList = newCurrentList.map(item => {
-      if (item.id === id) {
-        if (action === 'checked') return {...item, checked: !item.checked}
-        return {...item, active: !item.active}
-      }
-      return item;
-    })
-    setCurrentList(nextList)
+    let nextList;
+    const __item = currentList.find(item => item.id === id)
+    if (action === 'crossed') {
+      nextList = newCurrentList.filter(item => item.id != id);
+    }
+    if (action === 'checked') {
+      nextList = newCurrentList.map(item => {
+        if (item.id === id) {
+          return {
+            ...item, 
+            checked: !item.checked
+          }
+        }
+        return item;
+      })
+    }
+    setCurrentList(nextList as LItem[])
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(nextList));
   }
-  
+
   return (
     <main className={styles.main}>
       <div className={styles.search_container}>
         <form onSubmit={(e) => handleAddWithEnter(e)}>
-          <label>add items:{' '}</label>
           <input
             type='text'
             name='search'
-            placeholder='serach...'
+            placeholder='add items...'
             autoComplete='off'
             value={query}
             onChange={e => onChange(e)}
           />
         </form>
         <ul>
-          {query.length > 1 && fetchedFood.map((item, index) => 
+          {query.length > 1 && fetchedSuggestion.map((item, index) => 
             <li key={item + index} onClick={e => handleAddWithClick(e)}>{item}</li>
           )}
         </ul>
       </div>
       <div className={styles.list_container}>
         <ul>
-          {currentList.length > 0 && currentList.map((item, index) => 
+          {currentList?.length > 0 && currentList.map((item: { id: string; checked: boolean; name: string; }) => 
             <li 
-              key={item.id} 
+              key={item?.id} 
               className={
-                `${item.checked ? styles.list_item__checked : styles.list_item} 
-                ${!item.active ? styles.list_item__inactive : '' }`
+                `${item?.checked ? styles.list_item__checked : styles.list_item}`
               }
             >
-              <span className={styles.list_item_name}>{item.name}</span>
+              <span className={styles.list_item_name}>{item?.name}</span>
               <div className={styles.toggle_wrapper}>
                 <span 
                   onClick={() => updateListItem(item.id, 'checked')} 

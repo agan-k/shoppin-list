@@ -6,7 +6,11 @@
   margin: 0 auto;
   font-size: 16px;
 }
+.main form {
+}
 .main input[type="text"] {
+  width: 300px;
+  height: 30px;
   font-size: inherit;
   text-transform: lowercase;
 }
@@ -20,9 +24,6 @@
 .search_container {
   position: absolute;
 }
-.search_container label {
-  color: gray;
-}
 .search_container ul {
   background: none;
   background: rgb(32, 32, 32);
@@ -35,25 +36,30 @@
   cursor: pointer;
 }
 
-.list_item, .list_item__checked {
+.list_item, .list_item__loading, .list_item__checked {
   width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  font-size: 1.1em;
   padding: .5em;
 }
-.list_item__inactive {
-  display: none
-}
-.list_item__checked {
+.list_item__loading, .list_item__checked {
   color: gray;
   background: rgb(25, 25, 25);
 }
 .list_item__checked .list_item_name {
   text-decoration: line-through;
 }
+.toggle_wrapper {
+  font-size: 1.2em;
+  width: 3.2em;
+  display: flex;
+  justify-content: space-between;
+}
 .list_item_check, .list_item_cross {
-  padding: 0 .5em;
+  font-size: 1.3em;
+  cursor: pointer;
 }
 .list_item_cross {
   color: red;
