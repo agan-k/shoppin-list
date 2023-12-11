@@ -13,8 +13,9 @@ type LItem = {
 export default function ShoppingList() {
   const [query, setQuery] = useState('');
   const [fetchedSuggestion, setFetchedSuggestion] = useState([]);
-  const [currentList, setCurrentList] = useLocalStorage('list', []);
-  
+  const [currentList, setCurrentList] = useState([]);
+  // const [currentList, setCurrentList] = useLocalStorage('list', []);
+
   useEffect(() => {
     const debounceId = setTimeout(() => {
       submitQuery();
