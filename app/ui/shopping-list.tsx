@@ -91,7 +91,7 @@ export default function ShoppingList() {
         return item;
       })
     }
-    setCurrentList(nextList)
+    setCurrentList(nextList as LItem[])
   }
 
   return (
