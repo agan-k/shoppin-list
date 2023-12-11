@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, JSXElementConstructor, Key, PromiseLikeOfReactNode, ReactElement, ReactNode, ReactPortal } from 'react';
+import { useState, useEffect } from 'react';
 import useLocalStorage from '../lib/useLocalStorage';
 import styles from './shoppig-list.module.css'
 import { fetchFakeFood } from '../lib/data';
