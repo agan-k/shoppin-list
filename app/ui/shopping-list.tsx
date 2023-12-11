@@ -13,7 +13,7 @@ type LItem = {
 export default function ShoppingList() {
   const [query, setQuery] = useState('');
   const [fetchedSuggestion, setFetchedSuggestion] = useState([]);
-  const [currentList, setCurrentList] = useState([]);
+  const [currentList, setCurrentList] = useState<LItem[]>([]);
   // const [currentList, setCurrentList] = useLocalStorage('list', []);
 
   useEffect(() => {
@@ -76,7 +76,7 @@ export default function ShoppingList() {
 
   function updateListItem(id: string, action: string) {
     const newCurrentList = [...currentList];
-    let nextList: object [] = [];
+    let nextList = [];
     if (action === 'crossed') {
       nextList = newCurrentList.filter(item => item.id != id);
     }
