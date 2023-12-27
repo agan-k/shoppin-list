@@ -8,7 +8,7 @@ export default function Home() {
 
   return (
     <main className={styles.main}>
-      <h1>Soniya&apos;s Shopping List</h1>
+      <h1>Sonya&apos;s Shopping List</h1>
       <ShoppingList />
     </main>
   );
